@@ -14,7 +14,6 @@ from MtbPlot import *
 from InfoWindow import *
 
 
-
 class PlotWindow(QWidget):
     mtbGui = None
 
@@ -112,16 +111,6 @@ class PlotWindow(QWidget):
             self.mtbGui.plot.pokaz_wszystkie_linie = False
         self.mtbGui.plot.update_figure()
 
-class MtbGUI(object):
-    mtb = object
-    mtbPlot = object
-    plot = None
-
-    def __init__(self, mtb, mtbPlot):
-        self.mtb = mtb
-        self.mtbPlot = mtbPlot
-
-
 
 
 class MyMplCanvas(FigureCanvas):
@@ -136,9 +125,9 @@ class MyMplCanvas(FigureCanvas):
         # We want the axes cleared every time plot() is called
         #self.axes.hold(False)
         self.mtbPlot = mtbPlot
-        self.timer = []
-        self.timer.append(0)
-        self.timer.append(self.mtbPlot.momentPomiaruAll[-1:][0])
+        #print(mtbPlot)
+
+
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
 
@@ -169,21 +158,22 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
         #timer obecnie nie wykorzystywany, ale można wykorzystac go do pokazania tylko czesci wyników
         #wystarczy tylko przekazac odpowiednie wartości, a reszta będzie już działac
-        #timer = []
-        #timer.append(0)
-        #timer.append(self.mtbPlot.momentPomiaruAll[-1:][0])
+        timer = []
+        timer.append(0)
+        timer.append(self.mtbPlot.momentPomiaruAll[-1:][0])
 
         if self.pokaz_wszystkie_linie:
-            index = findElementIn(self.mtbPlot.momentPomiaruAll, int(self.timer[0])), findElementIn(
-                self.mtbPlot.momentPomiaruAll, int(self.timer[1]))
+            index = findElementIn(self.mtbPlot.momentPomiaruAll, int(timer[0])), findElementIn(
+                self.mtbPlot.momentPomiaruAll, int(timer[1]))
         else:
-            index = findElementIn(self.mtbPlot.momentPomiaru, int(self.timer[0])), findElementIn(
-                self.mtbPlot.momentPomiaru, int(self.timer[1]))
-
-        self.axes.set_xlim([min(self.mtbPlot.XAll), max(self.mtbPlot.XAll)])
-        self.axes.set_ylim([min(self.mtbPlot.YAll), max(self.mtbPlot.YAll)])
+            index = findElementIn(self.mtbPlot.momentPomiaru, int(timer[0])), findElementIn(
+                self.mtbPlot.momentPomiaru, int(timer[1]))
+        lim = [min(min(self.mtbPlot.XAll), min(self.mtbPlot.YAll)), max(max(self.mtbPlot.XAll), max(self.mtbPlot.YAll))]
+        self.axes.set_xlim(lim)
+        self.axes.set_ylim(lim)
 
         if self.pokaz_wszystkie_linie and self.nacisk:
+
             self.axes.scatter(self.mtbPlot.XAll[index[0]:index[1]], self.mtbPlot.YAll[index[0]:index[1]],
                         c=self.mtbPlot.naciskKoloryAll[index[0]:index[1]],
                         s=self.mtbPlot.gruboscAll[index[0]:index[1]])
