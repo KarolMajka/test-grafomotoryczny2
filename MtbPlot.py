@@ -25,7 +25,7 @@ class Plot(object):
         self.momentPomiaruAll = np.array(momentPomiaruAll)
 
 
-def getColorForPlot(nacisk, minValue):
+def getColorForPlot(nacisk, minValue, maxValue):
     # 0 - wysoki nacisk
     # 1/3 - niski nacisk
     # value przyjmuje wartosci 0-1023 (0 - niski nacisk, 1023 - wysoki nacisk)
@@ -33,7 +33,7 @@ def getColorForPlot(nacisk, minValue):
 
     if minValue >= nacisk:
         return colorsys.hsv_to_rgb(0.0, 0.0, 0.0)
-    nacisk /= 1024
+    nacisk /= maxValue
     nacisk = 1 - nacisk
     nacisk /= 3
     return colorsys.hsv_to_rgb(nacisk, 1.0, 1.0)
@@ -58,14 +58,14 @@ def createPlotObjectsFromMtbObjects(mtbFiles):
             if mtbFiles[i].pakietyDanych[j].nacisk > minimalnyNacisk:
                 plot[0][i].append(mtbFiles[i].pakietyDanych[j].polozenieX)
                 plot[1][i].append(mtbFiles[i].pakietyDanych[j].polozenieY)
-                plot[2][i].append(getColorForPlot(mtbFiles[i].pakietyDanych[j].nacisk, minimalnyNacisk))
+                plot[2][i].append(getColorForPlot(mtbFiles[i].pakietyDanych[j].nacisk, minimalnyNacisk, 1024))
                 plot[6][i].append(1)
                 plot[7][i].append(mtbFiles[i].pakietyDanych[j].momentPomiaru)
             else:
                 plot[6][i].append(0.03)
             plot[3][i].append(mtbFiles[i].pakietyDanych[j].polozenieX)
             plot[4][i].append(mtbFiles[i].pakietyDanych[j].polozenieY)
-            plot[5][i].append(getColorForPlot(mtbFiles[i].pakietyDanych[j].nacisk, minimalnyNacisk))
+            plot[5][i].append(getColorForPlot(mtbFiles[i].pakietyDanych[j].nacisk, minimalnyNacisk, 1024))
             plot[8][i].append(mtbFiles[i].pakietyDanych[j].momentPomiaru)
         plotObject.append(Plot(plot[0][i], plot[1][i], plot[2][i], plot[3][i], plot[4][i], plot[5][i], plot[6][i], plot[7][i], plot[8][i]))
     return plotObject
