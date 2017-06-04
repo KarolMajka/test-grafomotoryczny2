@@ -16,7 +16,8 @@ def GUILoop():
     app = QApplication(sys.argv)
     screen_resolution = app.desktop().screenGeometry()
     width, height = screen_resolution.width(), screen_resolution.height()
-    mainWindow = MainWindow(width, height)
+    mainWindow = MainWindow(800, 600)
+    mainWindow.showMaximized()
     sys.exit(app.exec_())
 
 class MainWindow(QMainWindow):
@@ -83,7 +84,9 @@ class MainWindow(QMainWindow):
 
 
     def initUI(self):
-        self.setGeometry(0, 0, self.width, self.height)
+        #self.setGeometry(0, 0, self.width, self.height)
+        self.move(0, 0)
+        self.resize(self.width, self.height)
         self.setWindowTitle('Test grafomotoryczny')
 
         mainMenu = self.menuBar()
@@ -118,7 +121,7 @@ class MainWindow(QMainWindow):
 
         #self.addToToolsMenu(toolsMenu)
 
-        self.show()
+        #self.show()
 
     def updateToolsMenu(self):
         self.pokazWszystkieLinieButton.setChecked(self.mtbGui.plot.pokaz_wszystkie_linie)
