@@ -126,7 +126,8 @@ class MyMplCanvas(FigureCanvas):
         #self.axes.hold(False)
         self.mtbPlot = mtbPlot
         #print(mtbPlot)
-
+        self.timer = []
+        self.timer.append(0)
         self.timer.append(self.mtbPlot.momentPomiaruAll[-1:][0])
 
         FigureCanvas.__init__(self, fig)
