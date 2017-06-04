@@ -127,6 +127,7 @@ class MyMplCanvas(FigureCanvas):
         self.mtbPlot = mtbPlot
         #print(mtbPlot)
 
+        self.timer.append(self.mtbPlot.momentPomiaruAll[-1:][0])
 
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
@@ -158,16 +159,16 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
         #timer obecnie nie wykorzystywany, ale można wykorzystac go do pokazania tylko czesci wyników
         #wystarczy tylko przekazac odpowiednie wartości, a reszta będzie już działac
-        timer = []
-        timer.append(0)
-        timer.append(self.mtbPlot.momentPomiaruAll[-1:][0])
+        #timer = []
+        #timer.append(0)
+        #timer.append(self.mtbPlot.momentPomiaruAll[-1:][0])
 
         if self.pokaz_wszystkie_linie:
-            index = findElementIn(self.mtbPlot.momentPomiaruAll, int(timer[0])), findElementIn(
-                self.mtbPlot.momentPomiaruAll, int(timer[1]))
+            index = findElementIn(self.mtbPlot.momentPomiaruAll, int(self.timer[0])), findElementIn(
+                self.mtbPlot.momentPomiaruAll, int(self.timer[1]))
         else:
-            index = findElementIn(self.mtbPlot.momentPomiaru, int(timer[0])), findElementIn(
-                self.mtbPlot.momentPomiaru, int(timer[1]))
+            index = findElementIn(self.mtbPlot.momentPomiaru, int(self.timer[0])), findElementIn(
+                self.mtbPlot.momentPomiaru, int(self.timer[1]))
         lim = [min(min(self.mtbPlot.XAll), min(self.mtbPlot.YAll)), max(max(self.mtbPlot.XAll), max(self.mtbPlot.YAll))]
         self.axes.set_xlim(lim)
         self.axes.set_ylim(lim)
