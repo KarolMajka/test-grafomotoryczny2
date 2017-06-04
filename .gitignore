@@ -1,1 +1,7 @@
-*.mtb
+# ignore all files (and all directories)
+*
+# re-include all directories
+!*/
+# re-include all python source files and all .gitignore files
+!*.py
+!.gitignore
