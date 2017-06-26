@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtCore import Qt, QLineF, QRectF
+from PyQt5.QtCore import Qt, QLineF, QRectF, QPointF
 from PyQt5.QtWidgets import (QLabel, QApplication, QFileDialog, QMainWindow, QWidget, QHBoxLayout, QAction, QScrollArea,
                              QVBoxLayout, QSlider, QCheckBox)
 from PyQt5.QtGui import QPixmap, QColor, QPainter, QPainterPath, QBrush
@@ -218,14 +218,15 @@ class PlotWidget(QLabel):
             # print("res2['determination'] = " + str(res2['determination']))
             # print("res/res2 = " + str(res['determination'] / res2['determination']))
             if res['determination'] / res2['determination'] > 10:
-                groups5 = groups5 + [group]
-                print(res)
                 direction = res['polynomial'][0]  # > 0 => clockwise
-                                                  # < 0 => counterclockwise
+                # < 0 => counterclockwise
                 if direction > 0:
-                    print("clockwise")
+                    desc = "CW"
                 else:
-                    print("counterclockwise")
+                    desc = "CCW"
+                groups5 = groups5 + [group + [desc]]
+                print(res)
+                print(desc)
 
         '''
         groups3 = sorted(groups2, key=lambda group: group[0])
@@ -340,12 +341,14 @@ class PlotWidget(QLabel):
         """
         groups = self.groups
         painter.setPen(QColor(0, 0, 0))
-        for group in groups:
+        for i, group in enumerate(groups):
             minX, minY, maxX, maxY, diffX, diffY = group[0:6]
             assert(diffX == maxX - minX)
             assert(diffY == maxY - minY)
             rect = QRectF(minX, minY, diffX, diffY)
             painter.drawRect(rect)
+            topLeft = QPointF(minX + 3, maxY - 3)
+            painter.drawText(topLeft, str(group[7]))
             # print(minX, minY, maxX, maxY)
         painter.end()
         self.setPixmap(pixmap)
