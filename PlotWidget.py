@@ -212,13 +212,20 @@ class PlotWidget(QLabel):
             # plt.show()
             sqrt_atan2_t_np = np.array(sqrt_atan2_t)
             res = polyfit(sqrt_atan2_t_np[:, 2], sqrt_atan2_t_np[:, 1], 1)
-            print(" res['determination'] = " + str(res['determination']))
+            # print(" res['determination'] = " + str(res['determination']))
             xyt_np = np.array(xyt)
             res2 = polyfit(xyt_np[:, 0], xyt_np[:, 1], 1)
-            print("res2['determination'] = " + str(res2['determination']))
-            print("res/res2 = " + str(res['determination'] / res2['determination']))
+            # print("res2['determination'] = " + str(res2['determination']))
+            # print("res/res2 = " + str(res['determination'] / res2['determination']))
             if res['determination'] / res2['determination'] > 10:
                 groups5 = groups5 + [group]
+                print(res)
+                direction = res['polynomial'][0]  # > 0 => clockwise
+                                                  # < 0 => counterclockwise
+                if direction > 0:
+                    print("clockwise")
+                else:
+                    print("counterclockwise")
 
         '''
         groups3 = sorted(groups2, key=lambda group: group[0])
@@ -258,7 +265,7 @@ class PlotWidget(QLabel):
         '''
 
         self.groups = groups5
-        print(len(self.groups))
+        # print(len(self.groups))
 
     def get_packages_in_rectangle(self, minX, minY, maxX, maxY):
         packages = self.mtb.pakietyDanych
