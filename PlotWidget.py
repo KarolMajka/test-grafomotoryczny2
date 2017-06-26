@@ -170,11 +170,14 @@ class PlotWidget(QLabel):
                 groups2 = groups2 + [group]
 
         groups3 = []
+        groups10 = []
         r = 0.8
         for group in groups2:
             minX, minY, maxX, maxY, diffX, diffY = group[0:6]
             if diffX / diffY > r and diffY / diffX > r:
                 groups3 = groups3 + [group]
+            else:
+                groups10 = groups10 + [group]
 
         groups4 = groups3
         m = 0.05
@@ -195,7 +198,8 @@ class PlotWidget(QLabel):
 
         i = 0
         groups5 = []
-        for group in sorted(groups4, key=lambda group: group[0]):
+        indices = []
+        for idx, group in enumerate(groups4):
             minX, minY, maxX, maxY, diffX, diffY = group[0:6]
             packages4 = self.get_packages_in_rectangle(minX, minY, maxX, maxY)
             avgX = (minX + maxX) / 2
@@ -208,9 +212,6 @@ class PlotWidget(QLabel):
                 if abs(d) > pi:
                     c = c - d
                 b[1] = b[1] + c
-            # plt.plot([t for sqrt, atan2, t in sqrt_atan2_t], [sqrt for sqrt, atan2, t in sqrt_atan2_t])
-            # plt.plot([t for sqrt, atan2, t in sqrt_atan2_t], [atan2 for sqrt, atan2, t in sqrt_atan2_t])
-            # plt.show()
             sqrt_atan2_t_np = np.array(sqrt_atan2_t)
             res = polyfit(sqrt_atan2_t_np[:, 2], sqrt_atan2_t_np[:, 1], 1)
             # print(" res['determination'] = " + str(res['determination']))
@@ -225,19 +226,31 @@ class PlotWidget(QLabel):
                     desc = "CW"
                 else:
                     desc = "CCW"
-                print(i)
+                # print(i)
                 i = i + 1
                 # print(res)
+                # plt.plot([t for sqrt, atan2, t in sqrt_atan2_t], [sqrt for sqrt, atan2, t in sqrt_atan2_t])
+                # plt.plot([t for sqrt, atan2, t in sqrt_atan2_t], [atan2 for sqrt, atan2, t in sqrt_atan2_t])
+                # plt.show()
                 res3 = polyfit(sqrt_atan2_t_np[:, 2], sqrt_atan2_t_np[:, 0], 1)
                 outin = res3['polynomial'][0] # > 0 => out
                                               # < 0 => in
-                print(res3)
+                # print(res3)
                 if res3['determination'] > 0.6:
                     if outin > 0:
                         desc = desc + " out"
                     else:
                         desc = desc + " in"
                 groups5 = groups5 + [group + [desc]]
+            else:
+                indices = indices + [idx]
+
+        for idx in indices:
+            groups10 = groups10 + [groups3[idx]]
+
+        groups11 = []
+        for group in groups10:
+            groups11 = groups11 + [group + ['?']]
 
         '''
         groups3 = sorted(groups2, key=lambda group: group[0])
@@ -276,7 +289,7 @@ class PlotWidget(QLabel):
             groups6 = groups6 + [[minX, minY, maxX, maxY, diffX, diffY] + group[6:]]
         '''
 
-        self.groups = groups5
+        self.groups = groups11
         # print(len(self.groups))
 
     def get_packages_in_rectangle(self, minX, minY, maxX, maxY):
