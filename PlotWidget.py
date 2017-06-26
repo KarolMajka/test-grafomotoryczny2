@@ -8,6 +8,8 @@ from PyQt5.QtGui import QPixmap, QColor, QPainter, QPainterPath, QBrush
 from Mtb import loadMtbFileStructure, Mtb, PakietDanych
 # from MtbPlot import getColorForPlot
 
+import matplotlib.pyplot as plt
+
 from itertools import tee
 
 def pairwise(iterable):
@@ -46,6 +48,20 @@ def join(groups, i, j):
     packages = group1[6] + group2[6]
     group = [minX, minY, maxX, maxY, deltaX, deltaY, packages]
     return [group] + [grp for idx, grp in enumerate(groups) if idx != i and idx != j]
+
+import numpy as np
+
+def polyfit(x, y, degree):
+    results = {}
+    coeffs = np.polyfit(x, y, degree)
+    results['polynomial'] = coeffs.tolist()
+    p = np.poly1d(coeffs)
+    yhat = p(x)
+    ybar = np.sum(y) / len(y)
+    ssreg = np.sum((yhat - ybar) ** 2)
+    sstot = np.sum((y - ybar) ** 2)
+    results['determination'] = ssreg / sstot
+    return results
 
 class PlotWidget(QLabel):
     def __init__(self, mtb, antialiasing=True, margin=0.01, sf=25, minVisiblePress=64, endTime=None):
@@ -175,6 +191,35 @@ class PlotWidget(QLabel):
             diffY = maxY - minY
             group[0:6] = minX, minY, maxX, maxY, diffX, diffY
 
+        from math import sqrt, atan2, pi
+
+        groups5 = []
+        for group in sorted(groups4, key=lambda group: group[0]):
+            minX, minY, maxX, maxY, diffX, diffY = group[0:6]
+            packages4 = self.get_packages_in_rectangle(minX, minY, maxX, maxY)
+            avgX = (minX + maxX) / 2
+            avgY = (minY + maxY) / 2
+            xyt = [(pkg.polozenieX - avgX, pkg.polozenieY - avgY, pkg.momentPomiaru) for pkg in packages4]
+            sqrt_atan2_t = [[sqrt(x * x + y * y), atan2(y, x), t] for x, y, t in xyt]
+            c = 0
+            for a, b in pairwise(sqrt_atan2_t):
+                d = (b[1] + c) - a[1]
+                if abs(d) > pi:
+                    c = c - d
+                b[1] = b[1] + c
+            # plt.plot([t for sqrt, atan2, t in sqrt_atan2_t], [sqrt for sqrt, atan2, t in sqrt_atan2_t])
+            # plt.plot([t for sqrt, atan2, t in sqrt_atan2_t], [atan2 for sqrt, atan2, t in sqrt_atan2_t])
+            # plt.show()
+            sqrt_atan2_t_np = np.array(sqrt_atan2_t)
+            res = polyfit(sqrt_atan2_t_np[:, 2], sqrt_atan2_t_np[:, 1], 1)
+            print(" res['determination'] = " + str(res['determination']))
+            xyt_np = np.array(xyt)
+            res2 = polyfit(xyt_np[:, 0], xyt_np[:, 1], 1)
+            print("res2['determination'] = " + str(res2['determination']))
+            print("res/res2 = " + str(res['determination'] / res2['determination']))
+            if res['determination'] / res2['determination'] > 10:
+                groups5 = groups5 + [group]
+
         '''
         groups3 = sorted(groups2, key=lambda group: group[0])
         groups4 = []
@@ -211,12 +256,15 @@ class PlotWidget(QLabel):
             diffY = maxY - minY
             groups6 = groups6 + [[minX, minY, maxX, maxY, diffX, diffY] + group[6:]]
         '''
-        self.groups = groups3
+
+        self.groups = groups5
         print(len(self.groups))
 
     def get_packages_in_rectangle(self, minX, minY, maxX, maxY):
         packages = self.mtb.pakietyDanych
-        return [pkg for pkg in packages if minX <= pkg.polozenieX <= maxX and minY <= pkg.polozenieY <= maxY]
+        res = [pkg for pkg in packages if minX <= pkg.polozenieX <= maxX and minY <= pkg.polozenieY <= maxY and pkg.nacisk >= self.minVisiblePress]
+        res.sort(key=lambda pkg: pkg.momentPomiaru)  # just to be sure
+        return res
 
     def repaint_pixmap(self):
         """"""
