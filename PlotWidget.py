@@ -214,6 +214,10 @@ class PlotWidget(QLabel):
         self.groups = groups3
         print(len(self.groups))
 
+    def get_packages_in_rectangle(self, minX, minY, maxX, maxY):
+        packages = self.mtb.pakietyDanych
+        return [pkg for pkg in packages if minX <= pkg.polozenieX <= maxX and minY <= pkg.polozenieY <= maxY]
+
     def repaint_pixmap(self):
         """"""
         pixmap = self.pixmap
