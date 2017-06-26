@@ -250,13 +250,12 @@ class PlotWidget(QLabel):
 
         groups11 = []
         for group in groups10:
-            groups11 = groups11 + [group + ['?']]
+            groups11 = groups11 + [group]
 
-        '''
-        groups3 = sorted(groups2, key=lambda group: group[0])
-        groups4 = []
-        prevGroup = groups3[0]
-        for group in groups3[1:]:
+        groups13 = sorted(groups11, key=lambda group: group[0])
+        groups14 = []
+        prevGroup = groups13[0]
+        for group in groups13[1:]:
             if group[0] - prevGroup[0] < w / 20:
                 prevGroup[1] = min(prevGroup[1], group[1])
                 prevGroup[2] = max(prevGroup[2], group[2])
@@ -264,32 +263,34 @@ class PlotWidget(QLabel):
                 prevGroup[4] = prevGroup[2] - prevGroup[0]
                 prevGroup[5] = prevGroup[3] - prevGroup[1]
             else:
-                groups4 = groups4 + [prevGroup]
+                groups14 = groups14 + [prevGroup]
                 prevGroup = group
-        groups4 = groups4 + [prevGroup]
-        groups5 = []
-        for group in groups4:
+        groups14 = groups14 + [prevGroup]
+
+        groups15 = []
+        for group in groups14:
             if group[5] < h * 0.5:
                 pass
             else:
-                groups5 = groups5 + [group]
-        groups6 = []
-        m = 0.2
-        n = 0.4
-        for group in groups2:
+                groups15 = groups15 + [group]
+
+        groups16 = []
+        m = 0.01
+        n = 0.01
+        desc_tab = ['zig-zag', '1st line', '2nd line', 'dashed line']
+        for idx, group in enumerate(groups15):
             minX, minY, maxX, maxY, diffX, diffY = group[0:6]
-            minX -= m * diffX
-            minY -= n * diffY
+            minX -= m * w
+            minY -= n * h
             minX, minY = max(minX, 0), max(minY, 0)
-            maxX += m * diffX
-            maxY += n * diffY
+            maxX += m * w
+            maxY += n * h
             maxX, maxY = min(maxX, w), min(maxY, h)
             diffX = maxX - minX
             diffY = maxY - minY
-            groups6 = groups6 + [[minX, minY, maxX, maxY, diffX, diffY] + group[6:]]
-        '''
+            groups16 = groups16 + [[minX, minY, maxX, maxY, diffX, diffY] + group[6:] + [desc_tab[idx]]]
 
-        self.groups = groups11
+        self.groups = groups16 + groups5
         # print(len(self.groups))
 
     def get_packages_in_rectangle(self, minX, minY, maxX, maxY):
